@@ -92,6 +92,11 @@ smooth_output_box: smooth_output_box.c \
 
 	${CC} ${CPPFLAGS} -o smooth_output_box smooth_output_box.c ${LDFLAGS}
 
+folder_smooth: folder_smooth.c \
+	${OBJ_FILES} \
+	${COSMO_FILES}
+
+	${CC} ${CPPFLAGS} -o folder_smooth folder_smooth.c ${LDFLAGS}
 
 clean:
 	rm ${OBJ_FILES} *~
