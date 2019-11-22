@@ -27,7 +27,6 @@
 #define Y_He (0.245)
 //#define POWER_INDEX (0.968) /* power law index for the power spectrum */
 #define wl   (-1.0) /* dark energy equation of state parameter (wl = -1 for vacuum ) */
-
 /*
    Note that the best fit b and c ST params for these 3D realisations have a redshift,
    and a DELTA_R_FACTOR (see ANAL_PARAMS.H) dependence, as (will be) shown in Mesinger+.
@@ -103,6 +102,7 @@
 
 
 /* CONSTANTS */
+#define fNL (double) 100
 #define LN10 (double) (2.30258509299)
 #define SIGMAT (double) (6.6524e-25)  /* Thomson scattering cross section in cm^-2 */
 #define SIGMA_HI (double) (6.3e-18)  /* HI ionization  cross section at 13.6 eV in cm^-2 */

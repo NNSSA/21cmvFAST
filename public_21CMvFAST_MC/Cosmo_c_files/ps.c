@@ -137,6 +137,20 @@ double TFmdm(double k); //Eisenstien & Hu power spectrum transfer function
 void TFset_parameters();
 float get_R_c();  // returns R_CUTOFF
 double get_M_min_ion(float z);
+
+double kappa3(double M);
+double dkappa3dm(double M);
+double F0(double z, double M);
+double F1(double z, double M);
+double F2(double z, double M);
+double dF0dM(double z, double M);
+double dF1dM(double z, double M);
+double dF2dM(double z, double M);
+double dNdM_Edgeworth(double z, double M);
+double dNdM_logEdgeworth(double z, double M);
+double FgtrM_Edgeworth(double z, double M);
+double FgtrM_logEdgeworth(double z, double M);
+
 /***************************************/
 
 /* Returns the minimum source mass for ionizing sources, according to user specifications */
@@ -1584,6 +1598,87 @@ void FcollSpline(float Overdensity, float *splined_value)
     *splined_value = returned_value;
 }
 
+// Additions by Nashwan Sabti (22/11/2019)
 
+double kappa3(double M){
+  return fNL * 6.6e-4 * (1 - 0.016 * log(hlittle * M / Msun));
+}
+
+double dkappa3dm(double M){
+  return -fNL * 6.6e-4 * 0.016 / M;
+}
+
+double F0(double z, double M){
+  double sigma, dicke_growth;
+
+  dicke_growth = dicke(z);
+  sigma = sigma_z0(M) * dicke_growth;
+
+  return 0.5 * erfcc(Deltac / sigma / sqrt(2.));
+}
+
+double F1(double z, double M){
+  double sigma, dicke_growth;
+
+  dicke_growth = dicke(z);
+  sigma = sigma_z0(M) * dicke_growth;
+
+  return exp(-pow(Deltac,2) / pow(sigma,2) / 2.) * kappa3(M) * hn(Deltac / sigma, 2) / 6. / sqrt(2. * PI);
+}
+
+double F2(double z, double M){
+  double sigma, dicke_growth;
+
+  dicke_growth = dicke(z);
+  sigma = sigma_z0(M) * dicke_growth;
+
+  return exp(-pow(Deltac,2) / pow(sigma,2) / 2.) * pow(kappa3(M), 2) * hn(Deltac / sigma, 5) / 72. / sqrt(2. * PI);
+}
+
+double dF0dM(double z, double M){
+  double sigma, dicke_growth, dsigmadm;
+
+  dicke_growth = dicke(z);
+  sigma = sigma_z0(M) * dicke_growth;
+  dsigmadm = dsigmasqdm_z0(M) * (dicke_growth*dicke_growth/(2*sigma));
+
+  return (Deltac/(pow(sigma,2))) * dsigmadm * exp(-pow(Deltac,2) / pow(sigma,2) / 2.) / sqrt(2. * PI);
+}
+
+double dF1dM(double z, double M){
+  double sigma, dicke_growth, dsigmadm;
+
+  dicke_growth = dicke(z);
+  sigma = sigma_z0(M) * dicke_growth;
+  dsigmadm = dsigmasqdm_z0(M) * (dicke_growth*dicke_growth/(2*sigma));
+
+  return dF0dM(z, M) * (kappa3(M) * hn(Deltac/sigma, 3) / 6. + dkappa3dm(M) * hn(Deltac / sigma, 2) * pow(sigma, 2) / 6. / Deltac / dsigmadm);
+}
+
+double dF2dM(double z, double M){
+  double sigma, dicke_growth, dsigmadm;
+
+  dicke_growth = dicke(z);
+  sigma = sigma_z0(M) * dicke_growth;
+  dsigmadm = dsigmasqdm_z0(M) * (dicke_growth*dicke_growth/(2*sigma));
+
+  return dF0dM(z, M) * (pow(kappa3(M), 2) * hn(Deltac/sigma, 6) / 72. + kappa3(M) * dkappa3dm(M) * hn(Deltac / sigma, 5) * pow(sigma, 2) / 36. / Deltac / dsigmadm);
+}
+
+double dNdM_Edgeworth(double z, double M){
+  return dNdM(z, M) * (1. + dF1dM(z, M) / dF0dM(z, M) + dF2dM(z, M) / dF0dM(z, M));
+}
+
+double dNdM_logEdgeworth(double z, double M){
+  return dNdM(z, M) * pow(E, F1(z, M) / F0(z, M) + F2(z, M) / F0(z, M) - 0.5 * pow(F1(z, M) / F0(z, M), 2)) * (1. + (dF1dM(z, M) + dF2dM(z, M)) / dF0dM(z, M) - (F1(z, M) * dF1dM(z, M)) / (F0(z, M) * dF0dM(z, M)) - (F1(z, M) + F2(z, M)) / F0(z, M) + pow(F1(z, M) / F0(z, M), 2));
+}
+
+double FgtrM_Edgeworth(double z, double M){
+  return F0(z, M) + F1(z, M) + F2(z, M);
+}
+
+double FgtrM_logEdgeworth(double z, double M){
+  return exp(log(F0(z, M)) + F1(z, M) / F0(z, M) + F2(z, M) / F0(z, M) - 0.5 * pow(F1(z, M) / F0(z, M), 2));
+}
 
 #endif
