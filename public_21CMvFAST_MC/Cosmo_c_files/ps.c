@@ -44,6 +44,9 @@ static gsl_spline *erfc_spline;
 #define Nlow 100
 #define NMass 200
 
+#define kappa3_NORMALIZATION 6.6e-4
+#define kappa3_log_PREFACTOR 0.016
+
 static double log_MFspline_table[SPLINE_NPTS], MFspline_params[SPLINE_NPTS];
 static double log_MFspline_table_densgtr1[SPLINE_NPTS], MFspline_params_densgtr1[SPLINE_NPTS];
 static gsl_interp_accel *MFspline_acc, *MFspline_densgtr1_acc;
@@ -1601,11 +1604,11 @@ void FcollSpline(float Overdensity, float *splined_value)
 // Additions by Nashwan Sabti (22/11/2019)
 
 double kappa3(double M){
-  return fNL * 6.6e-4 * (1 - 0.016 * log(hlittle * M / Msun));
+  return fNL * kappa3_NORMALIZATION * (1 - kappa3_log_PREFACTOR * log(hlittle * M / Msun));
 }
 
 double dkappa3dm(double M){
-  return -fNL * 6.6e-4 * 0.016 / M;
+  return -fNL * kappa3_NORMALIZATION * kappa3_log_PREFACTOR / M;
 }
 
 double F0(double z, double M){
