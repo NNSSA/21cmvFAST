@@ -104,7 +104,7 @@ float erfcc(float x)
 double h0(double x){
     return 1;
 }
- 
+
 double h1(double x){
     return 2*x;
 }
@@ -117,8 +117,8 @@ double hn(double x,int n){
         return h1(x);
     }
     else{
-        return 2 * x * hn(x,n-1) - 2 * (n-1) * hn(x,n-2);     
-    } 
+        return 2 * x * hn(x,n-1) - 2 * (n-1) * hn(x,n-2);
+    }
 }
 
 FILE *log_open(const char *filename)
