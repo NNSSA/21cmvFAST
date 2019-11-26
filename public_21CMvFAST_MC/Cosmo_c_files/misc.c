@@ -101,6 +101,26 @@ float erfcc(float x)
 	return x >= 0.0 ? ans : 2.0-ans;
 }
 
+double h0(double x){
+    return 1;
+}
+ 
+double h1(double x){
+    return 2*x;
+}
+
+double hn(double x,int n){
+    if(n == 0){
+        return h0(x);
+    }
+    else if(n == 1){
+        return h1(x);
+    }
+    else{
+        return 2 * x * hn(x,n-1) - 2 * (n-1) * hn(x,n-2);     
+    } 
+}
+
 FILE *log_open(const char *filename)
 {
   FILE *LOG;
